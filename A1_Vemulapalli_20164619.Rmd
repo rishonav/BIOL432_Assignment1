@@ -8,6 +8,9 @@ output: html_document
 #### Link to my GitHub repository:
 https://github.com/rishonav/BIOL432_Assignment1
 
+- Final versions of R scripts (dataGenerato.R, volumEstimato.R, and ThemeScript.R) can be found in the scripts folder of the repository 
+- Note: Some commit messages may be wrong as certain files got grouped together when committing/pushing to Github. 
+
 ### SETUP
 ```{r LoadingLibraries, message = FALSE}
 library(tidyr)
@@ -48,9 +51,7 @@ theme_set(theme_pub()) # setting the source theme as default
 
 ```{r Import}
 MeasurementData <- read.csv("measurements.csv")
-MeasurementData <- MeasurementData %>% 
-  select(-c(X)) %>% # removing default observation id number column
-  print()
+print(MeasurementData)
 ```
 
 <br>
@@ -93,7 +94,7 @@ CountSummary <- MeasurementData %>%
 Limb_bp <- ggplot(MeasurementData, aes(x = Species, y = Volume)) +
   geom_boxplot(aes(fill = Species)) +
   scale_x_discrete(labels = c("D. versicolor", "L. clamitans", "L. pipiens", "P. crucifer", "P. maculata")) +
-  scale_y_continuous("Limb volume (cm^3)", limits = c(0, 175), breaks = c(0, 25, 50, 75, 100, 125, 150, 175)) +
+  scale_y_continuous("Limb volume (cm^3)", limits = c(0, 75), breaks = c(0, 25, 50, 75)) +
   scale_fill_brewer(palette = "Set2")
 print(Limb_bp)
 ```
