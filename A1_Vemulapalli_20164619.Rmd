@@ -1,0 +1,117 @@
+---
+title: "BIOL 432 Assignment 1"
+author: "Rishona Vemulapalli (20164619)"
+date: "2023-01-13"
+output: html_document
+---
+
+#### Link to my GitHub repository:
+https://github.com/rishonav/BIOL432_Assignment1
+
+### SETUP
+```{r LoadingLibraries, message = FALSE}
+library(tidyr)
+library(dplyr)
+library(ggplot2)
+library(RColorBrewer)
+```
+
+<br>
+
+#### Running necessary R scripts sourced from computer
+
+**Script #1:** Generates limb measurement data. First, vectors of each variable are created using `sample()` (Species, Observer; categorical data) and `rnorm()` (Limb length, Limb width; numeric data). All 4 vectors containing 100 randomly selected values each are combined into a single data frame. Using `write.csv`, the data frame is exported to a .csv file called measurements.csv. 
+```{r GenerateDataScript}
+source("./scripts/dataGenerato.R") 
+```
+
+<br>
+
+**Script #2:** Calculates limb volume. Limb_width and Limb_length measurements from measurements.csv are used to calculate limb volume (visualized as a cone shape). The Volume variable is added to the data frame. Using `write.csv` again, the measurements.csv is overwritten with the updated dataframe.  
+```{r VolEstimatorScript}
+source("./scripts/volumeEstimato.R")
+```
+
+<br>
+
+**Script #3:** Clean theme to use for `ggplot` plotting (originally sourced from http://bit.ly/theme_pub). 
+```{r ThemeScript}
+source("./scripts/ThemeScript.R") 
+theme_set(theme_pub()) # setting the source theme as default
+```
+
+<br>
+
+### QUESTIONS 
+
+#### (1) Loading the overwritten data
+
+```{r Import}
+MeasurementData <- read.csv("measurements.csv")
+MeasurementData <- MeasurementData %>% 
+  select(-c(X)) %>% # removing default observation id number column
+  print()
+```
+
+<br>
+
+#### (2) Sorting data by species, then observer, and then limb volume
+
+```{r Reorder}
+MeasurementData <- MeasurementData %>%
+  arrange(Species, Observer, Volume) %>%
+  print()
+```
+
+<br>
+
+#### (3) Table of average limb volume by species
+
+```{r LimbSummary}
+LimbSummary <- MeasurementData %>%
+  group_by(Species) %>%
+  summarise("Average Volume" = mean(Volume)) %>%
+  print()
+```
+
+<br>
+
+#### (4) Table of number of observations (rows) for each combination of species and observer
+
+```{r CountSummary}
+CountSummary <- MeasurementData %>%
+  count(Species, Observer) %>%
+  rename(Num_Observations = n) %>% # number of observations
+  print()
+```
+
+<br>
+
+#### (5) Single boxplot to compare distributions of limb volume for each species
+
+```{r Fig1}
+Limb_bp <- ggplot(MeasurementData, aes(x = Species, y = Volume)) +
+  geom_boxplot(aes(fill = Species)) +
+  scale_x_discrete(labels = c("D. versicolor", "L. clamitans", "L. pipiens", "P. crucifer", "P. maculata")) +
+  scale_y_continuous("Limb volume (cm^3)", limits = c(0, 175), breaks = c(0, 25, 50, 75, 100, 125, 150, 175)) +
+  scale_fill_brewer(palette = "Set2")
+print(Limb_bp)
+```
+
+Figure 1. Boxplot of limb volume (cm^3) of 5 frog species; *Dryophytes versicolor*, *Lithobates clamitans*, *Lithobates pipiens*, *Pseudacris crucifer*, *Pseudacris maculata*). Limb volume was calculated using measurements of limb width and limb length. 
+
+<br>
+
+#### (6) Multi-panel frequency histograms plot for limb volume of each species
+
+Creating the multi-panel plot using `facet_wrap`. 
+```{r Fig2, message = FALSE}
+Limb_hists <- ggplot(MeasurementData, aes(x = Volume)) +
+  geom_histogram(aes(fill = Species), colour = "black") +
+  facet_wrap(Species ~ .) +
+  labs(x = "Limb volume (cm^3)", y = "Count") +
+  scale_fill_brewer(palette = "Set2")
+print(Limb_hists)
+```
+
+Figure 2. Multi-panel plot of 5 frequency histograms, showing the distribution of limb volume (cm^3) for each of the 5 frog species. Fixed x- and y-scales to compare distributions between levels.   
