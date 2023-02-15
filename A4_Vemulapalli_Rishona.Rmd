@@ -1,0 +1,71 @@
+---
+title: "BIOL 432 Week 5 A4: R-egex"
+author: "Rishona Vemulapalli (20164619)"
+date: "2023-02-08"
+output: html_document
+---
+
+### Link to my GitHub Repository:
+https://github.com/rishonav/BIOL432_Assignment1
+
+-------------------------------------------------------------
+
+### (SETUP)
+
+```{r message = FALSE}
+library(tidyverse)
+```
+
+-------------------------------------------------------------
+
+### (QUESTION 1) Import dataset created from Assignment 1.
+
+*Note: The Organism column named in this assignment's instructions is the Species column in my dataset from Assignment 1.*
+```{r}
+MData <- read.csv("measurements.csv")
+head(MData)
+```
+
+<br>
+
+-------------------------------------------------------------
+
+### (QUESTION 2) Add a new column called *sp* that shortens genus name in Species column to only first letter then period. 
+
+- **Use a dplyr command AND regular expression(s)**
+- **For example: Homo sapiens original column becomes H. sapiens in Sp column.**
+- **HINT: Think of regular expression commands like sub, grep, grepl and gsub as 'functions' that you can use with dplyr commands just like mean(), sd(), and desc() in
+the Data Science tutorial.**
+
+In a new added column called Sp, I am replacing the first match of the Genus name, comprised of any alphanumeric characters, in the *Species* column, with its first letter followed by a period, and its species name. 
+```{r}
+MDataShorter <- MData %>%
+  mutate(Sp = sub("(\\w)\\w+", "\\1.", Species), .after = Species) # placing new Sp column after the Species (Organism) column to make selection easier after
+
+print(MDataShorter) 
+```
+
+<br>
+
+-------------------------------------------------------------
+
+### (QUESTION 3) Create a new dataset with the Sp column. 
+
+- **Use a dplyr command to create a new dataset BUT with Sp column instead of the Organism column, moved to the beginning in place of the original Organism column.**
+
+```{r}
+MeasShortData <- select(MDataShorter, Sp:Volume)
+print(MeasShortData)
+```
+
+<br>
+
+-------------------------------------------------------------
+
+### (QUESTION 4) Save the dataset as a new file called MeasShort.csv
+
+```{r}
+write.csv(MeasShortData, file = "MeasShort.csv")
+```
+
+<br>
